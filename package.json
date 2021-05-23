@@ -20,7 +20,8 @@
     "deploy": "tsc && node dist/index.js",
     "lint": "eslint . --ignore-path ./.gitignore && stylelint **/*.{css,html} --ignore-path ./.gitignore",
     "lint:fix": "eslint . --ignore-path ./.gitignore --fix && stylelint **/*.{css,html} --ignore-path ./.gitignore --fix",
-    "docs": "cross-env DOCS=true npm run deploy"
+    "docs": "cross-env DOCS=true npm run deploy",
+    "test": "npm run build && corde"
   },
   "engines": {
     "node": ">=14.x"
@@ -70,6 +71,7 @@
     "@types/yt-search": "^2.3.0",
     "@typescript-eslint/eslint-plugin": "^4.28.1",
     "@typescript-eslint/parser": "^4.28.1",
+    "corde": "^4.0.3",
     "cross-env": "^7.0.3",
     "eslint": "^7.29.0",
     "eslint-config-prettier": "^8.3.0",
