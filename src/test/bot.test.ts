@@ -8,13 +8,20 @@ beforeStart(async () => {
 });
 
 group('main commands', () => {
-  test('schnansch command should return schnansch', () => {
+  test('music commands should return error', () => {
     const embed = {
       description: "I'm sorry but you need to be in a voice channel to play music!",
       footer: 'Something went wrong :(',
-      color: 'RANDOM'
+      color: 'RED'
     } as IMessageEmbed;
+    expect('earrape').toReturn(embed);
+    expect('leave').toReturn(embed);
     expect('play').toReturn(embed);
+    expect('playlist').toReturn(embed);
+    expect('radio').toReturn(embed);
+    expect('search').toReturn(embed);
+    expect('stop').toReturn(embed);
+    expect('volume').toReturn(embed);
   });
 });
 

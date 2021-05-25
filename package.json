@@ -21,7 +21,8 @@
     "lint": "eslint . --ignore-path ./.gitignore && stylelint **/*.{css,html} --ignore-path ./.gitignore",
     "lint:fix": "eslint . --ignore-path ./.gitignore --fix && stylelint **/*.{css,html} --ignore-path ./.gitignore --fix",
     "docs": "cross-env DOCS=true npm run deploy",
-    "test": "npm run build && corde"
+    "test": "npm run build && corde",
+    "test:only": "corde"
   },
   "engines": {
     "node": ">=14.x"

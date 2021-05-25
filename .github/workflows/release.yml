@@ -37,6 +37,8 @@ jobs:
         run: npm ci
       - name: Build TypeScript
         run: npm run build
+      - name: Run test command
+        run: npm run test:only
       - name: Release
         run: npm run release
         env:
