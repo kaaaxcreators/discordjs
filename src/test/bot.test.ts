@@ -21,7 +21,7 @@ group('music commands', () => {
     expect('resume').toReturn(samevc);
     expect('shuffle').toReturn(samevc);
     expect('skip').toReturn(samevc);
-    expect('skipto').toReturn(samevc);
+    expect('skipto 1').toReturn(samevc);
     expect('stop').toReturn(samevc);
     expect('volume').toReturn(samevc);
   });
