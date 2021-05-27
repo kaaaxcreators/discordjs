@@ -7,21 +7,35 @@ beforeStart(async () => {
   await new Promise((r) => setTimeout(r, 4999));
 });
 
-group('main commands', () => {
-  test('music commands should return error', () => {
-    const embed = {
+group('music commands', () => {
+  test('various commands should return samevc', () => {
+    const samevc = {
+      description: "I'm sorry but you need to be in the same voice channel as me!",
+      footer: 'Something went wrong :(',
+      color: 'RED'
+    } as IMessageEmbed;
+    expect('earrape').toReturn(samevc);
+    expect('loop').toReturn(samevc);
+    expect('pause').toReturn(samevc);
+    expect('remove').toReturn(samevc);
+    expect('resume').toReturn(samevc);
+    expect('shuffle').toReturn(samevc);
+    expect('skip').toReturn(samevc);
+    expect('skipto').toReturn(samevc);
+    expect('stop').toReturn(samevc);
+    expect('volume').toReturn(samevc);
+  });
+  test('various commands should return novc', () => {
+    const novc = {
       description: "I'm sorry but you need to be in a voice channel to play music!",
       footer: 'Something went wrong :(',
       color: 'RED'
     } as IMessageEmbed;
-    expect('earrape').toReturn(embed);
-    expect('leave').toReturn(embed);
-    expect('play').toReturn(embed);
-    expect('playlist').toReturn(embed);
-    expect('radio').toReturn(embed);
-    expect('search').toReturn(embed);
-    expect('stop').toReturn(embed);
-    expect('volume').toReturn(embed);
+    expect('leave').toReturn(novc);
+    expect('play').toReturn(novc);
+    expect('playlist').toReturn(novc);
+    expect('radio').toReturn(novc);
+    expect('search').toReturn(novc);
   });
 });
 
