@@ -10,5 +10,5 @@ module.exports = {
   channelId: process.env.CHANNELID || 'channelId',
   botPrefix: 'm',
   testMatches: ['./dist/test/**'],
-  timeout: 10000
+  timeout: 50000
 };

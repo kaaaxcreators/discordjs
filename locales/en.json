@@ -178,7 +178,7 @@
     }
   },
   "play": {
-    "description": "Play a Songs",
+    "description": "Play a Song",
     "usage": "<YouTube URL> | <Spotify Track URL> | <Song Name>",
     "missingargs": "You didn't provide what to play",
     "notfound": {

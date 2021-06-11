@@ -1,10 +1,10 @@
 import { afterAll, beforeStart, expect, group, test } from 'corde';
-import { IMessageEmbed } from 'corde/lib/src/types';
+import { IEmbedFieldData, IMessageEmbed, IMessageEmbedFooter } from 'corde/lib/src/types';
 
 import { client } from '../index';
 
 beforeStart(async () => {
-  await new Promise((r) => setTimeout(r, 4999));
+  await new Promise((r) => setTimeout(r, 25000));
 });
 
 group('music commands', () => {
@@ -36,6 +36,41 @@ group('music commands', () => {
     expect('playlist').toReturn(novc);
     expect('radio').toReturn(novc);
     expect('search').toReturn(novc);
+  });
+});
+group('maincommands', () => {
+  test('count', () => {
+    const count = {
+      color: 'YELLOW',
+      description: 'The Bot is currently in 2 Servers',
+      footer: 'Use minvite to add/invite the Bot to your server'
+    } as IMessageEmbed;
+    expect('count').toReturn(count);
+  });
+  test('invite', () => {
+    const invite = {
+      title: 'Invite kaaaxTest',
+      description:
+        'Want me in your server? Invite me today! \n\n [Invite Link](https://discord.com/oauth2/authorize?client_id=' +
+        process.env.BOTID +
+        '6&permissions=2205281600&scope=bot)',
+      color: 'BLUE'
+    } as IMessageEmbed;
+    expect('invite').toReturn(invite);
+  });
+});
+group('didyoumean', () => {
+  const didyoumean = {
+    title: '🤔 didyoumean',
+    color: 'DARK_VIVID_PINK',
+    description: 'Did you mean',
+    fields: [{ name: 'Description', value: '' }] as IEmbedFieldData[],
+    footer: { text: 'kaaaxCorde' } as IMessageEmbedFooter
+  } as IMessageEmbed;
+  test('test didyoumean suggestion', () => {
+    didyoumean.fields![0].value = 'Play a Song';
+    didyoumean.description = 'Did you mean `play`?';
+    expect('pla').toEmbedMatch(didyoumean);
   });
 });
 

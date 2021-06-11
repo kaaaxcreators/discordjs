@@ -46,3 +46,9 @@ jobs:
           CORDETOKEN: ${{ secrets.CORDETOKEN }}
           CHANNELID: ${{ secrets.CHANNELID }}
           BOTID: ${{ secrets.BOTID }}
+          DIDYOUMEAN: true
+          DISABLE_WEB: true
+          WEB: WEB
+          SECRET: SECRET
+          LOCALE: en
+          
