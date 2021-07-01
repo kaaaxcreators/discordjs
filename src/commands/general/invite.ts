@@ -18,6 +18,17 @@ module.exports = {
   },
 
   run: async function (client: Client, message: Message) {
+    if (config.DISABLEWEB) {
+      const url = `https://discord.com/oauth2/authorize?client_id=${client.user!.id}&permissions=${
+        config.PERMISSION
+      }&scope=bot`;
+      const embed = new MessageEmbed()
+        .setTitle(`${i18n.__('invite.embed.title')} ${client.user!.username}`)
+        .setDescription(i18n.__mf('invite.embed.description', { url: url }))
+        .setURL(url)
+        .setColor('BLUE');
+      return message.channel.send(embed);
+    }
     //set the permissions id here (https://discordapi.com/permissions.html)
     const url = `https://discord.com/oauth2/authorize?client_id=${client.user!.id}&permissions=${
       config.PERMISSION

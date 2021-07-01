@@ -36,3 +36,19 @@ jobs:
         run: npm ci
       - name: Run build command
         run: npm run build
+      - name: Run test command
+        run: npm run test:only
+        env:
+          TOKEN: ${{ secrets.TOKEN }}
+          PRESENCE: ${{ secrets.PRESENCE }}
+          PREFIX: ${{ secrets.PREFIX }}
+          GUILDID: ${{ secrets.GUILDID }}
+          CORDETOKEN: ${{ secrets.CORDETOKEN }}
+          CHANNELID: ${{ secrets.CHANNELID }}
+          BOTID: ${{ secrets.BOTID }}
+          DIDYOUMEAN: true
+          DISABLE_WEB: true
+          WEB: WEB
+          SECRET: SECRET
+          LOCALE: en
+          

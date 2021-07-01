@@ -9,7 +9,8 @@ i18n.setLocale(config.LOCALE);
 import sendError from '../util/error';
 
 module.exports = async (client: Client, message: Message) => {
-  if (message.author.bot) {
+  // Check if bot is Testing Bot
+  if (message.author.bot && !message.author.username.endsWith('Corde')) {
     return;
   }
 
