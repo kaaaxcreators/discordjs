@@ -72,7 +72,7 @@
     "@types/yt-search": "^2.3.0",
     "@typescript-eslint/eslint-plugin": "^4.28.1",
     "@typescript-eslint/parser": "^4.28.1",
-    "corde": "^4.1.2",
+    "corde": "^4.2.0",
     "cross-env": "^7.0.3",
     "eslint": "^7.29.0",
     "eslint-config-prettier": "^8.3.0",
@@ -83,7 +83,7 @@
     "prettier": "^2.3.2",
     "stylelint": "^13.13.1",
     "stylelint-config-standard": "^22.0.0",
-    "typescript": "^4.3.4"
+    "typescript": "^4.3.5"
   },
   "funding": {
     "type": "individual",
