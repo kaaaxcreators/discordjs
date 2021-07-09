@@ -1,5 +1,5 @@
 import connectLivereload from 'connect-livereload';
-import { MessageEmbed, Permissions, Util } from 'discord.js';
+import { MessageEmbed, Permissions, TextChannel, Util, VoiceChannel } from 'discord.js';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import i18n from 'i18n';
@@ -13,9 +13,9 @@ import spdl from 'spdl-core';
 import yts from 'yt-search';
 import ytdl from 'ytdl-core';
 
-import { client, commands, config } from '../index';
+import { client, commands, config, IQueue } from '../index';
 import database, { getGuild } from '../util/database';
-import { Song } from '../util/playing';
+import play, { Song } from '../util/playing';
 i18n.setLocale(config.LOCALE);
 
 import Auth from './Middlewares/Auth';
@@ -127,6 +127,8 @@ api.post('/api/prefix/:id/:prefix', async (req, res) => {
 
 api.post('/api/queue/:id/add/:song', async (req, res) => {
   const { id, song } = req.params;
+  const vchannel = <string>req.query.vchannel;
+  const mchannel = <string>req.query.mchannel;
   if (
     typeof id !== 'string' ||
     typeof Number.parseInt(id) !== 'number' ||
@@ -250,7 +252,50 @@ api.post('/api/queue/:id/add/:song', async (req, res) => {
       serverQueue.textChannel.send(embed);
       return res.json(Song);
     } else {
-      return res.status(501).json({ status: 501 });
+      if (mchannel && vchannel) {
+        const textChannel = <TextChannel>await client.channels.cache.get(mchannel);
+        const voiceChannel = <VoiceChannel>await client.channels.cache.get(vchannel);
+        if (
+          // check if channels are valid and if user has perms
+          textChannel?.type === 'text' &&
+          voiceChannel?.type === 'voice' &&
+          textChannel.permissionsFor(user)?.has('SEND_MESSAGES') &&
+          voiceChannel.permissionsFor(user)?.has('SPEAK')
+        ) {
+          const queueConstruct: IQueue = {
+            textChannel: textChannel,
+            voiceChannel: voiceChannel,
+            connection: null,
+            songs: [],
+            volume: 80,
+            playing: true,
+            loop: false
+          };
+          queueConstruct.songs.push(Song);
+          (await import('../index')).queue.set(id, queueConstruct);
+          try {
+            const connection = await voiceChannel.join();
+            queueConstruct.connection = connection;
+            const message = {
+              guild: {
+                id: id
+              },
+              channel: textChannel
+            };
+            play.play(queueConstruct.songs[0], message);
+          } catch (error) {
+            console.error(`${i18n.__('error.join')} ${error}`);
+            (await import('../index')).queue.delete(id);
+            voiceChannel.leave();
+            return res.status(500).json({ status: i18n.__('error.join') });
+          }
+          return res.json({ status: 200 });
+        } else {
+          return res.status(400).json({ status: 400 });
+        }
+      } else {
+        return res.status(400).json({ status: 400 });
+      }
     }
   }
 });

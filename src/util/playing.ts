@@ -1,4 +1,12 @@
-import { Message, MessageEmbed, StreamType, User } from 'discord.js';
+import {
+  DMChannel,
+  Message,
+  MessageEmbed,
+  NewsChannel,
+  StreamType,
+  TextChannel,
+  User
+} from 'discord.js';
 import ytdlDiscord from 'discord-ytdl-core';
 import i18n from 'i18n';
 import pMS from 'pretty-ms';
@@ -11,7 +19,11 @@ import sendError from '../util/error';
 import play from './playing';
 
 export default {
-  async play(song: Song, message: Message, searchMessage?: Message): Promise<void> {
+  async play(
+    song: Song,
+    message: { guild: { id: string } | null; channel: TextChannel | NewsChannel | DMChannel },
+    searchMessage?: Message
+  ): Promise<void> {
     const queue = Queue.get(message.guild!.id);
     if (!song) {
       Queue.delete(message.guild!.id);
