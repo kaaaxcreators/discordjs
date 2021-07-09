@@ -1,5 +1,5 @@
 {
-    // Credits: https://blog.logrocket.com/how-to-debug-node-js-apps-in-visual-studio-code/
+  // Credits: https://blog.logrocket.com/how-to-debug-node-js-apps-in-visual-studio-code/
   "version": "0.2.0",
   "configurations": [
       {
