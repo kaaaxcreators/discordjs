@@ -13,7 +13,7 @@ import pMS from 'pretty-ms';
 import scdl from 'soundcloud-downloader/dist/index';
 import spdl from 'spdl-core';
 
-import { config, queue as Queue } from '../index';
+import { config, queue as Queue, Stats } from '../index';
 i18n.setLocale(config.LOCALE);
 import sendError from '../util/error';
 import play from './playing';
@@ -94,6 +94,7 @@ export default {
     const dispatcher = queue!
       .connection!.play(stream, { type: streamType! })
       .on('finish', () => {
+        Stats.songsPlayed++;
         const shifted = queue!.songs.shift();
         if (queue!.loop === true) {
           queue!.songs.push(shifted!);

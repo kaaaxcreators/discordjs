@@ -14,7 +14,7 @@ function socket(io: Server): void {
         clearInterval(socket.Dashboard);
       }
       socket.Dashboard = setInterval(async () => {
-        const { client } = await import('../../index');
+        const { client, Stats } = await import('../../index');
         let totalvcs = 0;
         client.guilds.cache.array().forEach((guild) => {
           if (guild.voice?.connection) {
@@ -29,7 +29,9 @@ function socket(io: Server): void {
             ? client.user!.avatarURL()
             : 'https://i.imgur.com/fFReq20.png',
           username: client.user!.username,
-          totalvcs: totalvcs
+          totalvcs: totalvcs,
+          commandsRan: Stats.commandsRan,
+          songsPlayed: Stats.songsPlayed
         });
       }, 1000);
     });

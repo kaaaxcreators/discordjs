@@ -316,7 +316,9 @@
 				"servers": "Servers",
 				"uptime": "Uptime",
 				"avatar": "Avatar",
-				"totalvcs": "VCs connected to"
+				"totalvcs": "VCs connected to",
+				"commandsran": "Commands executed",
+				"songsplayed": "Songs played"
 			}
 		},
 		"server": {

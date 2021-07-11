@@ -37,5 +37,7 @@ $(document).ready(() => {
     $('#avatar').prop('src', data.avatarURL);
     $('.server-name').text(data.username);
     $('#totalvcs').text(data.totalvcs);
+    $('#commandsRan').text(data.commandsRan);
+    $('#songsPlayed').text(data.songsPlayed);
   });
 });

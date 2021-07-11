@@ -64,6 +64,11 @@ export const config: Config = {
   GUILDPREFIX: process.env.GUILDPREFIX ? /true/i.test(process.env.GUILDPREFIX) : false
 };
 
+export const Stats = {
+  commandsRan: 0,
+  songsPlayed: 0
+};
+
 // Configure i18n
 i18n.configure({
   locales: locales,
