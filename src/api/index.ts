@@ -2,6 +2,7 @@ import { Router, static as Static } from 'express';
 import session from 'express-session';
 import passport from 'passport';
 import passportDiscord from 'passport-discord';
+import passportOAuth2Refresh from 'passport-oauth2-refresh';
 import { join } from 'path';
 
 import { client, config } from '../index';
@@ -9,22 +10,26 @@ import routes from './routes';
 
 const api = Router();
 
-passport.use(
-  new passportDiscord.Strategy(
-    {
-      clientID: client.user!.id,
-      clientSecret: config.SECRET,
-      callbackURL: config.WEBSITE + config.CALLBACK,
-      scope: 'identify guilds'
-    },
-    (accessToken, refreshToken, profile, done) => {
-      // User logged in
-      process.nextTick(() => {
-        return done(null, profile);
-      });
-    }
-  )
+const discordStrategy = new passportDiscord.Strategy(
+  {
+    clientID: client.user!.id,
+    clientSecret: config.SECRET,
+    callbackURL: config.WEBSITE + config.CALLBACK,
+    scope: 'identify guilds'
+  },
+  (accessToken, refreshToken, profile, done) => {
+    // User logged in
+    profile.refreshToken = refreshToken;
+    profile.accessToken = accessToken;
+    process.nextTick(() => {
+      return done(null, profile);
+    });
+  }
 );
+
+passport.use(discordStrategy);
+
+passportOAuth2Refresh.use(discordStrategy);
 
 api.use(
   session({
@@ -52,8 +57,8 @@ api.get(
   }
 );
 
-passport.deserializeUser((obj, done) => {
-  done(null, <Express.User>obj);
+passport.deserializeUser((obj: Express.User, done) => {
+  done(null, obj);
 });
 
 api.use('/', Static(join(__dirname, '../../assets')));
@@ -81,3 +86,5 @@ api.all('*', (req, res) => {
 });
 
 export default api;
+
+export { passportOAuth2Refresh };

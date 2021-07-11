@@ -404,6 +404,26 @@ api.get('/api/channels/:id', async (req, res) => {
   }
 });
 
+api.get('/api/update', async (req, res) => {
+  if (!req.user || req.isUnauthenticated() || !req.user.guilds || !req.user.refreshToken) {
+    res.status(401).json({ status: 401 });
+  } else {
+    (await import('./index')).passportOAuth2Refresh.requestNewAccessToken(
+      'discord',
+      req.user.refreshToken,
+      (err, accessToken, refreshToken) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ status: 500 });
+        }
+        req.user!.accessToken = accessToken;
+        req.user!.refreshToken = refreshToken;
+        return res.json({ status: 200 });
+      }
+    );
+  }
+});
+
 api.get('/logout', (req, res) => {
   if (req.user) {
     req.logout();
