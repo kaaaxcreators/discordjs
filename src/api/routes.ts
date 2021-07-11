@@ -253,14 +253,24 @@ api.post('/api/queue/:id/add/:song', async (req, res) => {
       return res.json(Song);
     } else {
       if (mchannel && vchannel) {
-        const textChannel = <TextChannel>await client.channels.cache.get(mchannel);
-        const voiceChannel = <VoiceChannel>await client.channels.cache.get(vchannel);
+        const textChannel =
+          <TextChannel>client.channels.cache.get(mchannel) ||
+          <TextChannel>await client.channels.fetch(mchannel);
+        const voiceChannel =
+          <VoiceChannel>client.channels.cache.get(vchannel) ||
+          <VoiceChannel>await client.channels.fetch(vchannel);
+        const guildMember =
+          client.guilds.cache.get(id)?.members.cache.get(user.id) ||
+          (await (await client.guilds.fetch(id)).members.fetch(user.id));
+        if (!guildMember) {
+          return res.status(401).json({ status: 401 });
+        }
         if (
           // check if channels are valid and if user has perms
           textChannel?.type === 'text' &&
           voiceChannel?.type === 'voice' &&
-          textChannel.permissionsFor(user)?.has('SEND_MESSAGES') &&
-          voiceChannel.permissionsFor(user)?.has('SPEAK')
+          textChannel.permissionsFor(guildMember)?.has('SEND_MESSAGES') &&
+          voiceChannel.permissionsFor(guildMember)?.has('SPEAK')
         ) {
           const queueConstruct: IQueue = {
             textChannel: textChannel,
@@ -339,6 +349,58 @@ api.post('/api/queue/:id/skip', async (req, res) => {
     } else {
       return res.status(501).json({ status: 501 });
     }
+  }
+});
+
+api.get('/api/channels/:id', async (req, res) => {
+  const { id } = req.params;
+  if (
+    typeof id !== 'string' ||
+    typeof Number.parseInt(id) !== 'number' ||
+    isNaN(Number.parseInt(id))
+  ) {
+    res.status(400).json({ status: 400 });
+  } else if (!req.user || req.isUnauthenticated() || !req.user.guilds) {
+    res.status(401).json({ status: 401 });
+  } else if (
+    // check if is in guild
+    !req.user.guilds
+      .map((guildInfo) => ({
+        id: guildInfo.id,
+        hasPerms: guildInfo.hasPerms
+      }))
+      .find((arr) => arr.id == id)
+  ) {
+    res.status(403).json({ status: 403 });
+  } else {
+    const client = (await import('../index')).client;
+    const guild = client.guilds.cache.get(id) || (await client.guilds.fetch(id));
+    const user = guild.members.cache.get(req.user.id) || (await guild.members.fetch(req.user.id)!);
+    const channels = guild.channels.cache!;
+    const currentVoiceChannel = user.voice.channel;
+    const textChannels = channels
+      ?.filter(
+        (channel) =>
+          channel.type == 'text' &&
+          !!channel.permissionsFor(user) &&
+          channel.permissionsFor(user)!.has('SEND_MESSAGES')
+      )
+      .array();
+    const voiceChannels = channels
+      ?.filter(
+        (channel) =>
+          channel.type == 'voice' &&
+          !!channel.permissionsFor(user) &&
+          channel.permissionsFor(user)!.has('SPEAK')
+      )
+      .array();
+    res.json({
+      status: 200,
+      channels: textChannels?.concat(voiceChannels),
+      textChannels,
+      voiceChannels,
+      currentVoiceChannel
+    });
   }
 });
 

@@ -8,7 +8,7 @@
 - [x] fix socket doesn't work on two clients simultaneously
 - [x] new layout
 - [x] be able to add songs to queue from dashboard
-- [ ] be able to add songs without queue from dashboard
+- [x] be able to add songs without queue from dashboard
 - [ ] Don't have to login again when changing role, leaving, etc <- Security Issue
 
 ### When Done

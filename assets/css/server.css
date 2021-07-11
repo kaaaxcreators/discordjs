@@ -101,7 +101,8 @@ var {
 }
 
 .modal-content,
-.form-control {
+.form-control,
+.form-select {
   color: var(--text) !important;
   background-color: var(--background) !important;
 }

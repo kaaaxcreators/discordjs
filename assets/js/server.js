@@ -18,6 +18,32 @@ function translate(json) {
   });
 }
 
+/**
+ * Add Song to Queue
+ * @param {string} song Song Name
+ * @param {string} mchannel Text Channel ID
+ * @param {string} vchannel Voice Channel ID
+ */
+function addSongToQueue(song, mchannel, vchannel) {
+  if (mchannel && vchannel) {
+    return fetch(
+      `/api/queue/${window.location.pathname.split('/')[2]}/add/${encodeURIComponent(
+        song
+      )}?mchannel=${mchannel}&vchannel=${vchannel}`,
+      {
+        method: 'POST'
+      }
+    );
+  } else {
+    return fetch(
+      `/api/queue/${window.location.pathname.split('/')[2]}/add/${encodeURIComponent(song)}`,
+      {
+        method: 'POST'
+      }
+    );
+  }
+}
+
 $(document).ready(() => {
   $('#changeprefixsubmit').on('click', null, null, () => {
     fetch(`/api/prefix/${window.location.pathname.split('/')[2]}/${$('#newprefix').val()}`, {
@@ -35,16 +61,38 @@ $(document).ready(() => {
         $('#prefixmodalerror').text(err.message || err);
       });
   });
+  $('#openaddsongstoqueuemodal').on('click', null, null, async () => {
+    const GuildID = window.location.pathname.split('/')[2];
+    const channels = await (await fetch(`/api/channels/${GuildID}`)).json();
+    $('#selectmchannel').empty();
+    $('#selectvchannel').empty();
+    $.each(channels.textChannels, (i, v) => {
+      $('#selectmchannel').append(
+        $('<option>', {
+          value: v.id,
+          text: v.name
+        })
+      );
+    });
+    $.each(channels.voiceChannels, (i, v) => {
+      $('#selectvchannel').append(
+        v.id == channels.currentVoiceChannel.id
+          ? $('<option>', {
+              value: v.id,
+              text: v.name,
+              selected: true
+            })
+          : $('<option>', {
+              value: v.id,
+              text: v.name
+            })
+      );
+    });
+    $('#addSongWithoutQueue').modal('toggle');
+  });
   $('#addsongsubmit').on('click', null, null, () => {
     $('#songmodalerror').text('🔍 Searching...');
-    fetch(
-      `/api/queue/${window.location.pathname.split('/')[2]}/add/${encodeURIComponent(
-        $('#addSongSong').val()
-      )}`,
-      {
-        method: 'POST'
-      }
-    )
+    addSongToQueue($('#addSongSong').val())
       .then((res) => {
         if (!res.ok) {
           throw new Error(`${res.statusText}`);
@@ -56,6 +104,26 @@ $(document).ready(() => {
       .catch((err) => {
         console.error(err.message || err);
         $('#songmodalerror').text(err.message || err);
+      });
+  });
+  $('#addsongwithoutqueuesubmit').on('click', null, null, () => {
+    $('#songqueuemodalerror').text('🔍 Searching...');
+    addSongToQueue(
+      $('#addSongSongWithoutQueue').val(),
+      $('#selectmchannel').val(),
+      $('#selectvchannel').val()
+    )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`${res.statusText}`);
+        } else {
+          $('#addSongWithoutQueue').modal('toggle');
+          $('#songqueuemodalerror').text('');
+        }
+      })
+      .catch((err) => {
+        console.error(err.message || err);
+        $('#songqueuemodalerror').text(err.message || err);
       });
   });
   $('#skipsong').on('click', null, null, () => {
@@ -89,7 +157,7 @@ $(document).ready(() => {
       `https://cdn.discordapp.com/avatars/${data.user.id}/${data.user.avatar}`
     );
     $('#username').text(`${data.user.username}#${data.user.discriminator}`);
-    let Guild = data.user.guilds.find((x) => x.id == window.location.pathname.split('/')[2]);
+    const Guild = data.user.guilds.find((x) => x.id == window.location.pathname.split('/')[2]);
     $('#servername').text(Guild.name);
     $('#servericon').attr(
       'src',
@@ -98,7 +166,7 @@ $(document).ready(() => {
         : 'https://i.imgur.com/fFReq20.png'
     );
     // Guilds User and Bot are in and not current Guild
-    let Guilds = data.user.guilds.filter(
+    const Guilds = data.user.guilds.filter(
       (guild) => guild.inGuild && guild.id != window.location.pathname.split('/')[2]
     );
     Guilds.forEach((guild) => {
@@ -110,7 +178,6 @@ $(document).ready(() => {
         } height="15"></img>${guild.name}</a></li>`
       );
     });
-    console.log(Guild);
     if (!Guild.inGuild) {
       $.get('/api/info', (data) => {
         window.location = `https://discord.com/oauth2/authorize?client_id=${
@@ -133,12 +200,14 @@ $(document).ready(() => {
     $('#newprefix').attr('placeholder', data.prefix);
     if (data.nowPlaying) {
       $('.needsqueue').show();
+      $('.hatesqueue').hide();
       $('#now-playing').text(data.nowPlaying.title);
       $('#now-playing').replaceWith("<a id='now-playing'>" + $('#now-playing').html() + '</a>');
       $('#now-playing').attr('href', data.nowPlaying.url);
       $('#now-playing').attr('target', '_blank');
     } else {
       $('.needsqueue').hide();
+      $('.hatesqueue').show();
       $('#now-playing').text(translation.web.server.song.nothing);
       $('#now-playing').replaceWith(
         "<span id='now-playing'>" + $('#now-playing').html() + '</span>'
